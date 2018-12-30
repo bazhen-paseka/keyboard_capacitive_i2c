@@ -46,6 +46,8 @@
 /* USER CODE BEGIN Includes */
 
 	#include <string.h>
+	#include "lcd1602_fc113_sm.h"
+	#define ADR_I2C_FC113 0x27
 
 /* USER CODE END Includes */
 
@@ -79,6 +81,7 @@ int main(void)
 
 	char DataChar[100];
 	int uptime = 0;
+	int SizeChar;
 
   /* USER CODE END 1 */
 
@@ -112,6 +115,22 @@ int main(void)
 
 	sprintf(DataChar,"I2C added\r\n");
 	HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
+
+	lcd1602_fc113_struct h1_lcd1602_fc113 =
+	{
+		.i2c = &hi2c1,
+		.device_i2c_address = ADR_I2C_FC113
+	};
+
+	LCD1602_Init(&h1_lcd1602_fc113);
+	I2C_ScanBus(&h1_lcd1602_fc113);
+
+	LCD1602_Clear(&h1_lcd1602_fc113);
+	sprintf(DataChar,"LCD1602 Started");
+	SizeChar = strlen(DataChar);
+	LCD1602_Print_Line(&h1_lcd1602_fc113, DataChar, SizeChar);
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -124,6 +143,10 @@ int main(void)
 	uptime++;
 	sprintf(DataChar,"uptime: %d\r\n", uptime);
 	HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
+
+	SizeChar = strlen(DataChar);
+	LCD1602_Clear(&h1_lcd1602_fc113);
+	LCD1602_Print_Line(&h1_lcd1602_fc113, DataChar, SizeChar);
 
   /* USER CODE END WHILE */
 
