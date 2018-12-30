@@ -1,0 +1,3 @@
+[submodule "src/lcd1602_fc113_sm"]
+	path = src/lcd1602_fc113_sm
+	url = https://github.com/bazhen-paseka/lcd1602_fc113_sm.git

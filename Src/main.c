@@ -39,9 +39,15 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f1xx_hal.h"
+#include "i2c.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
+
+	#include <string.h>
+	#include "lcd1602_fc113_sm.h"
+	#define ADR_I2C_FC113 0x27
 
 /* USER CODE END Includes */
 
@@ -73,6 +79,10 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
+	char DataChar[100];
+	int uptime = 0;
+	int SizeChar;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -93,7 +103,33 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART1_UART_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
+
+	sprintf(DataChar,"\r\n\r\nUART1 for debug Start\r\n");
+	HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
+
+	sprintf(DataChar,"TX only; port PA9; speed 38`400\r\n");
+	HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
+
+	sprintf(DataChar,"I2C added\r\n");
+	HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
+
+	lcd1602_fc113_struct h1_lcd1602_fc113 =
+	{
+		.i2c = &hi2c1,
+		.device_i2c_address = ADR_I2C_FC113
+	};
+
+	LCD1602_Init(&h1_lcd1602_fc113);
+	I2C_ScanBus(&h1_lcd1602_fc113);
+
+	LCD1602_Clear(&h1_lcd1602_fc113);
+	sprintf(DataChar,"LCD1602 Started");
+	SizeChar = strlen(DataChar);
+	LCD1602_Print_Line(&h1_lcd1602_fc113, DataChar, SizeChar);
+
 
   /* USER CODE END 2 */
 
@@ -103,6 +139,15 @@ int main(void)
   {
 	 HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
 	 HAL_Delay(1200);
+
+	uptime++;
+	sprintf(DataChar,"uptime: %d\r\n", uptime);
+	HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
+
+	SizeChar = strlen(DataChar);
+	LCD1602_Clear(&h1_lcd1602_fc113);
+	LCD1602_Print_Line(&h1_lcd1602_fc113, DataChar, SizeChar);
+
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
