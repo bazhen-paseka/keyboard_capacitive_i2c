@@ -39,9 +39,12 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f1xx_hal.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
+
+	#include <string.h>
 
 /* USER CODE END Includes */
 
@@ -73,6 +76,9 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
+	char DataChar[100];
+	int uptime = 0;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -93,7 +99,14 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+
+	sprintf(DataChar,"\r\n\r\nUART1 for debug Start\r\n");
+	HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
+
+	sprintf(DataChar,"TX only; port PA9; speed 38`400\r\n");
+	HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
 
   /* USER CODE END 2 */
 
@@ -103,6 +116,11 @@ int main(void)
   {
 	 HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
 	 HAL_Delay(1200);
+
+	uptime++;
+	sprintf(DataChar,"uptime: %d\r\n", uptime);
+	HAL_UART_Transmit(&huart1, (uint8_t *)DataChar, strlen(DataChar), 100);
+
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
